@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>דיווח ביצוע עבודה</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --card: #1a1d27; --card2: #1f2235;
+    --accent: #4f8ef7; --accent2: #6c63ff;
+    --green: #22c55e; --red: #ef4444;
+    --text: #e8eaf0; --muted: #8892a4;
+    --border: #2a2f45; --input-bg: #141720; --radius: 12px;
+  }
+  body { font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 60px 0; }
+  .header { background: linear-gradient(135deg, #1a1d27 0%, #1f2235 100%); border-bottom: 1px solid var(--border); padding: 20px 20px 16px; position: sticky; top: 0; z-index: 100; }
+  .header h1 { font-size: 18px; font-weight: 700; }
+  .header p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .lang-toggle { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); display: flex; gap: 6px; }
+  .lang-btn { padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; font-family: 'Heebo', sans-serif; transition: all 0.2s; }
+  .lang-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .container { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .section-title { font-size: 13px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+  label .required { color: var(--red); margin-right: 3px; }
+  input[type="text"], input[type="date"], textarea {
+    width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 11px 14px; font-size: 15px; color: var(--text); font-family: 'Heebo', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,142,247,0.12); }
+  input.error, textarea.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+  input[type="date"] { color-scheme: dark; }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+  .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+  .checkbox-item { display: flex; align-items: center; gap: 10px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: border-color 0.2s; }
+  .checkbox-item:hover { border-color: var(--accent); }
+  .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; padding: 0; border: none; background: transparent; }
+  .checkbox-item span { font-size: 14px; color: var(--text); }
+  .checkbox-item.checked { border-color: var(--accent); background: rgba(79,142,247,0.08); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .order-block { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+  .order-block:last-child { margin-bottom: 0; }
+  .order-num { font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .order-block .field { margin-bottom: 10px; }
+  .order-block .field:last-child { margin-bottom: 0; }
+  .file-upload { border: 2px dashed var(--border); border-radius: 10px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--input-bg); }
+  .file-upload:hover { border-color: var(--accent); }
+  .file-upload.has-file { border-color: var(--green); background: rgba(34,197,94,0.05); }
+  .file-upload input { display: none; }
+  .file-icon { font-size: 32px; margin-bottom: 8px; }
+  .file-text { font-size: 13px; color: var(--muted); }
+  .file-name { font-size: 13px; color: var(--green); font-weight: 500; margin-top: 6px; }
+  .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); border: none; border-radius: var(--radius); color: white; font-size: 16px; font-weight: 700; font-family: 'Heebo', sans-serif; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 8px; }
+  .submit-btn:hover { opacity: 0.92; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .success-screen { display: none; text-align: center; padding: 60px 20px; }
+  .success-icon { font-size: 64px; margin-bottom: 20px; }
+  .success-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .success-sub { font-size: 15px; color: var(--muted); margin-bottom: 30px; }
+  .new-btn { padding: 14px 32px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 15px; font-weight: 600; font-family: 'Heebo', sans-serif; cursor: pointer; }
+  .error-msg { font-size: 11px; color: var(--red); margin-top: 4px; display: none; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-left: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .notice { background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 id="hTitle">דיווח ביצוע עבודה</h1>
+  <p id="hSub">רב בריח — מחלקת קבלנים</p>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('he', event)">עב</button>
+    <button class="lang-btn" onclick="setLang('ru', event)">Ру</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✅</div>
+    <div class="success-title" id="successTitle">הדיווח נשלח בהצלחה!</div>
+    <div class="success-sub" id="successSub">הנתונים נשמרו במערכת</div>
+    <button class="new-btn" id="newBtn" onclick="resetForm()">דיווח חדש</button>
+  </div>
+
+  <form id="mainForm">
+    <div class="notice" id="noticeText">שדות המסומנים ב-<span style="color:#ef4444">*</span> הם שדות חובה</div>
+
+    <!-- פרטים כלליים -->
+    <div class="section">
+      <div class="section-title" id="sec1Title">פרטים כלליים</div>
+
+      <div class="field">
+        <label><span class="required">*</span><span id="l_installer">שם מתקין</span></label>
+        <input type="text" id="installer" />
+        <div class="error-msg" id="e_installer">שדה חובה</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label><span class="required">*</span><span id="l_date">תאריך התקנה</span></label>
+          <input type="date" id="workDate" />
+          <div class="error-msg" id="e_workDate">שדה חובה</div>
+        </div>
+        <div class="field">
+          <label><span class="required">*</span><span id="l_tofes">מספר טופס</span></label>
+          <input type="text" id="tofesNum" placeholder="6780" />
+          <div class="error-msg" id="e_tofesNum">שדה חובה</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="l_type">סוג התקנה</label>
+        <div class="checkbox-group" id="installTypeGroup">
+          <label class="checkbox-item">
+            <input type="checkbox" value="התקנה רגילה" onchange="toggleChecked(this)" />
+            <span id="l_type1">התקנה רגילה</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" value="פירוק והתקנה חדשה" onchange="toggleChecked(this)" />
+            <span id="l_type2">פירוק והתקנה חדשה</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" value="אחר" onchange="toggleChecked(this)" />
+            <span id="l_type3">אחר</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="l_contractor">שם קבלן</label>
+        <input type="text" id="contractor" />
+      </div>
+
+      <div class="field">
+        <label id="l_manager">מנהל אזור</label>
+        <input type="text" id="manager" />
+      </div>
+    </div>
+
+    <!-- פירוט הזמנות -->
+    <div class="section">
+      <div class="section-title" id="sec2Title">פירוט הזמנות</div>
+      <div id="ordersContainer"></div>
+    </div>
+
+    <!-- כמויות -->
+    <div class="section">
+      <div class="section-title" id="sec3Title">סיכום כמויות</div>
+      <div class="grid-2">
+        <div class="field">
+          <label id="l_q1">משקופים חד כנפי</label>
+          <input type="text" id="q_single" placeholder="0" />
+        </div>
+        <div class="field">
+          <label id="l_q2">משקופים דו כנפי</label>
+          <input type="text" id="q_double" placeholder="0" />
+        </div>
+        <div class="field">
+          <label id="l_q3">חיתוכים</label>
+          <input type="text" id="q_cut" placeholder="0" />
+        </div>
+        <div class="field">
+          <label id="l_q4">רפפות</label>
+          <input type="text" id="q_shutter" placeholder="0" />
+        </div>
+        <div class="field">
+          <label id="l_q5">תוספת</label>
+          <input type="text" id="q_extra" placeholder="0" />
+        </div>
+      </div>
+    </div>
+
+    <!-- צירוף טופס -->
+    <div class="section">
+      <div class="section-title" id="sec4Title">צירוף טופס</div>
+      <div class="file-upload" id="fileUpload" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept="image/*" capture="camera" onchange="handleFile(this)" />
+        <div class="file-icon">📷</div>
+        <div class="file-text" id="fileText">לחץ לצילום או העלאת תמונה</div>
+        <div class="file-name" id="fileName"></div>
+      </div>
+    </div>
+
+    <button type="button" class="submit-btn" id="submitBtn" onclick="submitForm()">
+      <span id="submitText">שלח דיווח</span>
+    </button>
+  </form>
+</div>
+
+<script>
+const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+
+const T = {
+  he: {
+    hTitle: 'דיווח ביצוע עבודה', hSub: 'רב בריח — מחלקת קבלנים',
+    noticeText: 'שדות המסומנים ב-<span style="color:#ef4444">*</span> הם שדות חובה',
+    sec1Title: 'פרטים כלליים', sec2Title: 'פירוט הזמנות',
+    sec3Title: 'סיכום כמויות', sec4Title: 'צירוף טופס',
+    l_installer: 'שם מתקין', l_date: 'תאריך התקנה', l_tofes: 'מספר טופס',
+    l_type: 'סוג התקנה', l_type1: 'התקנה רגילה', l_type2: 'פירוק והתקנה חדשה', l_type3: 'אחר',
+    l_contractor: 'שם קבלן', l_manager: 'מנהל אזור',
+    l_q1: 'משקופים חד כנפי', l_q2: 'משקופים דו כנפי',
+    l_q3: 'חיתוכים', l_q4: 'רפפות', l_q5: 'תוספת',
+    orderNum: 'הזמנה', orderLabel: 'מספר הזמנה', detailLabel: 'פירוט (דירות, קומות...)',
+    fileText: 'לחץ לצילום או העלאת תמונה',
+    submitText: 'שלח דיווח', sending: 'שולח...',
+    successTitle: 'הדיווח נשלח בהצלחה!', successSub: 'הנתונים נשמרו במערכת',
+    newBtn: 'דיווח חדש', required: 'שדה חובה',
+  },
+  ru: {
+    hTitle: 'Отчёт о выполненных работах', hSub: 'Рав Бриах — отдел подрядчиков',
+    noticeText: 'Поля со <span style="color:#ef4444">*</span> обязательны для заполнения',
+    sec1Title: 'Общие сведения', sec2Title: 'Детали заказов',
+    sec3Title: 'Итого по количеству', sec4Title: 'Прикрепить бланк',
+    l_installer: 'Имя монтажника', l_date: 'Дата установки', l_tofes: 'Номер бланка',
+    l_type: 'Тип установки', l_type1: 'Обычная установка', l_type2: 'Демонтаж и новая установка', l_type3: 'Другое',
+    l_contractor: 'Название подрядчика', l_manager: 'Менеджер района',
+    l_q1: 'Одностворчатые косяки', l_q2: 'Двустворчатые косяки',
+    l_q3: 'Порезки', l_q4: 'Жалюзи', l_q5: 'Дополнительно',
+    orderNum: 'Заказ', orderLabel: 'Номер заказа', detailLabel: 'Детали (квартиры, этажи...)',
+    fileText: 'Нажмите для съёмки или загрузки фото',
+    submitText: 'Отправить отчёт', sending: 'Отправка...',
+    successTitle: 'Отчёт успешно отправлен!', successSub: 'Данные сохранены в системе',
+    newBtn: 'Новый отчёт', required: 'Обязательное поле',
+  }
+};
+
+let lang = 'he', fileData = null;
+
+function setLang(l, event) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  if (event) event.target.classList.add('active');
+  document.documentElement.dir = l === 'he' ? 'rtl' : 'ltr';
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = T[lang];
+  Object.keys(t).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = t[id];
+  });
+  document.querySelectorAll('.error-msg').forEach(e => e.textContent = t.required);
+  buildOrders();
+}
+
+function toggleChecked(checkbox) {
+  checkbox.parentElement.classList.toggle('checked', checkbox.checked);
+}
+
+function buildOrders() {
+  const t = T[lang];
+  const c = document.getElementById('ordersContainer');
+  const existing = {};
+  for (let i = 1; i <= 10; i++) {
+    const on = document.getElementById('order_num_' + i);
+    const od = document.getElementById('order_detail_' + i);
+    if (on) existing['n'+i] = on.value;
+    if (od) existing['d'+i] = od.value;
+  }
+  c.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const req = i === 1 ? `<span class="required">*</span>` : '';
+    const block = document.createElement('div');
+    block.className = 'order-block';
+    block.innerHTML = `
+      <div class="order-num">${t.orderNum} ${i}</div>
+      <div class="field">
+        <label>${req}${t.orderLabel}</label>
+        <input type="text" id="order_num_${i}" placeholder="SO26XXXXXX" value="${existing['n'+i]||''}" />
+        ${i===1 ? `<div class="error-msg" id="e_order1">${t.required}</div>` : ''}
+      </div>
+      <div class="field">
+        <label>${t.detailLabel}</label>
+        <textarea id="order_detail_${i}" rows="2">${existing['d'+i]||''}</textarea>
+      </div>`;
+    c.appendChild(block);
+  }
+}
+
+function handleFile(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileUpload').classList.add('has-file');
+    const reader = new FileReader();
+    reader.onload = e => { fileData = e.target.result; };
+    reader.readAsDataURL(file);
+  }
+}
+
+function validateForm() {
+  let valid = true;
+  ['installer','workDate','tofesNum'].forEach(id => {
+    const el = document.getElementById(id);
+    const err = document.getElementById('e_' + id);
+    if (!el.value.trim()) {
+      el.classList.add('error'); if (err) err.style.display = 'block'; valid = false;
+    } else {
+      el.classList.remove('error'); if (err) err.style.display = 'none';
+    }
+  });
+  const o1 = document.getElementById('order_num_1');
+  const e1 = document.getElementById('e_order1');
+  if (!o1.value.trim()) {
+    o1.classList.add('error'); if (e1) e1.style.display = 'block'; valid = false;
+  } else {
+    o1.classList.remove('error'); if (e1) e1.style.display = 'none';
+  }
+  return valid;
+}
+
+function getInstallTypes() {
+  const checked = [];
+  document.querySelectorAll('#installTypeGroup input[type="checkbox"]:checked').forEach(cb => checked.push(cb.value));
+  return checked.join(', ');
+}
+
+function collectData() {
+  const orders = [];
+  for (let i = 1; i <= 10; i++) {
+    const num = document.getElementById('order_num_' + i)?.value.trim();
+    const detail = document.getElementById('order_detail_' + i)?.value.trim();
+    if (num) orders.push({ num, detail });
+  }
+  return {
+    installer: document.getElementById('installer').value.trim(),
+    workDate: document.getElementById('workDate').value,
+    tofesNum: document.getElementById('tofesNum').value.trim(),
+    installType: getInstallTypes(),
+    contractor: document.getElementById('contractor').value.trim(),
+    manager: document.getElementById('manager').value.trim(),
+    orders,
+    q_single: document.getElementById('q_single').value.trim(),
+    q_double: document.getElementById('q_double').value.trim(),
+    q_cut: document.getElementById('q_cut').value.trim(),
+    q_shutter: document.getElementById('q_shutter').value.trim(),
+    q_extra: document.getElementById('q_extra').value.trim(),
+    fileData,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+async function submitForm() {
+  if (!validateForm()) return;
+  const btn = document.getElementById('submitBtn');
+  const txt = document.getElementById('submitText');
+  btn.disabled = true;
+  txt.innerHTML = T[lang].sending + '<span class="spinner"></span>';
+  const data = collectData();
+  try {
+    if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+      await new Promise(r => setTimeout(r, 1200));
+    } else {
+      await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    }
+    showSuccess();
+  } catch (e) {
+    btn.disabled = false;
+    txt.textContent = T[lang].submitText;
+    alert('שגיאה בשליחה. נסה שוב.');
+  }
+}
+
+function showSuccess() {
+  document.getElementById('mainForm').style.display = 'none';
+  const s = document.getElementById('successScreen');
+  s.style.display = 'block';
+  document.getElementById('successTitle').textContent = T[lang].successTitle;
+  document.getElementById('successSub').textContent = T[lang].successSub;
+  document.getElementById('newBtn').textContent = T[lang].newBtn;
+}
+
+function resetForm() {
+  document.getElementById('mainForm').reset();
+  fileData = null;
+  document.getElementById('fileName').textContent = '';
+  document.getElementById('fileUpload').classList.remove('has-file');
+  document.querySelectorAll('.checkbox-item').forEach(el => el.classList.remove('checked'));
+  document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+  document.querySelectorAll('.error-msg').forEach(e => e.style.display = 'none');
+  buildOrders();
+  document.getElementById('successScreen').style.display = 'none';
+  document.getElementById('mainForm').style.display = 'block';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitText').textContent = T[lang].submitText;
+  window.scrollTo(0, 0);
+}
+
+buildOrders();
+document.getElementById('workDate').valueAsDate = new Date();
+</script>
+</body>
+</html>
