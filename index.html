@@ -359,7 +359,7 @@ async function submitForm() {
   txt.innerHTML = T[lang].sending + '<span class="spinner"></span>';
   const data = collectData();
   try {
-    if (SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbw2DyzN4HjQ9-amvuMiJ_ZSR1hwBYGXX_SKFbBLV4R2cuUMRooEULm71dPdNCZLDIZ_/exec') {
+    if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
       await new Promise(r => setTimeout(r, 1200));
     } else {
       await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
