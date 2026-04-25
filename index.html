@@ -145,17 +145,7 @@
         <input type="text" id="manager" />
       </div>
 
-      <div class="field">
-        <label class="checkbox-item" style="margin-bottom:0">
-          <input type="checkbox" id="wantEmail" onchange="toggleEmailField(this)" />
-          <span id="l_wantEmail">קבל העתק של הדיווח במייל</span>
-        </label>
-      </div>
-      <div class="field" id="emailFieldWrapper" style="display:none">
-        <label><span id="l_email">כתובת מייל</span></label>
-        <input type="text" id="email" placeholder="example@gmail.com" />
-        <div class="error-msg" id="e_email">כתובת מייל לא תקינה</div>
-      </div>
+
     </div>
 
     <!-- פירוט הזמנות -->
@@ -199,6 +189,22 @@
         <div class="file-icon">📷</div>
         <div class="file-text" id="fileText">לחץ לצילום או העלאת תמונה</div>
         <div class="file-name" id="fileName"></div>
+      </div>
+    </div>
+
+    <!-- מייל -->
+    <div class="section">
+      <div class="section-title">קבלת העתק במייל</div>
+      <div class="field">
+        <label class="checkbox-item" style="margin-bottom:0">
+          <input type="checkbox" id="wantEmail" onchange="toggleEmailField(this)" />
+          <span id="l_wantEmail">קבל העתק של הדיווח במייל</span>
+        </label>
+      </div>
+      <div class="field" id="emailFieldWrapper" style="display:none;margin-top:10px">
+        <label><span id="l_email">כתובת מייל</span></label>
+        <input type="text" id="email" placeholder="example@gmail.com" />
+        <div class="error-msg" id="e_email">כתובת מייל לא תקינה</div>
       </div>
     </div>
 
