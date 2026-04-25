@@ -144,6 +144,18 @@
         <label id="l_manager">מנהל אזור</label>
         <input type="text" id="manager" />
       </div>
+
+      <div class="field">
+        <label class="checkbox-item" style="margin-bottom:0">
+          <input type="checkbox" id="wantEmail" onchange="toggleEmailField(this)" />
+          <span id="l_wantEmail">קבל העתק של הדיווח במייל</span>
+        </label>
+      </div>
+      <div class="field" id="emailFieldWrapper" style="display:none">
+        <label><span id="l_email">כתובת מייל</span></label>
+        <input type="text" id="email" placeholder="example@gmail.com" />
+        <div class="error-msg" id="e_email">כתובת מייל לא תקינה</div>
+      </div>
     </div>
 
     <!-- פירוט הזמנות -->
@@ -207,7 +219,7 @@ const T = {
     sec3Title: 'סיכום כמויות', sec4Title: 'צירוף טופס',
     l_installer: 'שם מתקין', l_date: 'תאריך התקנה', l_tofes: 'מספר טופס',
     l_type: 'סוג התקנה', l_type1: 'התקנה רגילה', l_type2: 'פירוק והתקנה חדשה', l_type3: 'אחר',
-    l_contractor: 'שם קבלן', l_manager: 'מנהל אזור',
+    l_contractor: 'שם קבלן', l_manager: 'מנהל אזור', l_wantEmail: 'קבל העתק של הדיווח במייל', l_email: 'כתובת מייל',
     l_q1: 'משקופים חד כנפי', l_q2: 'משקופים דו כנפי',
     l_q3: 'חיתוכים', l_q4: 'רפפות', l_q5: 'תוספת',
     orderNum: 'הזמנה', orderLabel: 'מספר הזמנה', detailLabel: 'פירוט (דירות, קומות...)',
@@ -223,7 +235,7 @@ const T = {
     sec3Title: 'Итого по количеству', sec4Title: 'Прикрепить бланк',
     l_installer: 'Имя монтажника', l_date: 'Дата установки', l_tofes: 'Номер бланка',
     l_type: 'Тип установки', l_type1: 'Обычная установка', l_type2: 'Демонтаж и новая установка', l_type3: 'Другое',
-    l_contractor: 'Название подрядчика', l_manager: 'Менеджер района',
+    l_contractor: 'Название подрядчика', l_manager: 'Менеджер района', l_wantEmail: 'Получить копию отчёта на почту', l_email: 'Эл. адрес',
     l_q1: 'Одностворчатые косяки', l_q2: 'Двустворчатые косяки',
     l_q3: 'Порезки', l_q4: 'Жалюзи', l_q5: 'Дополнительно',
     orderNum: 'Заказ', orderLabel: 'Номер заказа', detailLabel: 'Детали (квартиры, этажи...)',
@@ -256,6 +268,13 @@ function applyTranslations() {
 
 function toggleChecked(checkbox) {
   checkbox.parentElement.classList.toggle('checked', checkbox.checked);
+}
+
+
+function toggleEmailField(checkbox) {
+  const wrapper = document.getElementById('emailFieldWrapper');
+  wrapper.style.display = checkbox.checked ? 'block' : 'none';
+  if (!checkbox.checked) document.getElementById('email').value = '';
 }
 
 function buildOrders() {
@@ -340,6 +359,7 @@ function collectData() {
     installType: getInstallTypes(),
     contractor: document.getElementById('contractor').value.trim(),
     manager: document.getElementById('manager').value.trim(),
+    email: document.getElementById('email').value.trim(),
     orders,
     q_single: document.getElementById('q_single').value.trim(),
     q_double: document.getElementById('q_double').value.trim(),
@@ -359,12 +379,15 @@ async function submitForm() {
   txt.innerHTML = T[lang].sending + '<span class="spinner"></span>';
   const data = collectData();
   try {
+    let reportNum = '—';
     if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
       await new Promise(r => setTimeout(r, 1200));
     } else {
-      await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const resp = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const result = await resp.json().catch(() => ({}));
+      if (result.reportNum) reportNum = result.reportNum;
     }
-    showSuccess();
+    showSuccess(reportNum);
   } catch (e) {
     btn.disabled = false;
     txt.textContent = T[lang].submitText;
@@ -372,13 +395,21 @@ async function submitForm() {
   }
 }
 
-function showSuccess() {
+function showSuccess(reportNum) {
   document.getElementById('mainForm').style.display = 'none';
   const s = document.getElementById('successScreen');
   s.style.display = 'block';
   document.getElementById('successTitle').textContent = T[lang].successTitle;
   document.getElementById('successSub').textContent = T[lang].successSub;
   document.getElementById('newBtn').textContent = T[lang].newBtn;
+  let numEl = document.getElementById('reportNumDisplay');
+  if (!numEl) {
+    numEl = document.createElement('div');
+    numEl.id = 'reportNumDisplay';
+    numEl.style.cssText = 'font-size:20px;font-weight:700;color:#4f8ef7;margin:16px 0;padding:12px;background:#e8f0fe;border-radius:8px;';
+    document.getElementById('successSub').after(numEl);
+  }
+  numEl.textContent = lang === 'he' ? 'מספר דיווח: ' + reportNum : 'Номер отчёта: ' + reportNum;
 }
 
 function resetForm() {
