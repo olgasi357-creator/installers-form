@@ -343,7 +343,16 @@
       </div>
     </div>
 
-    <button type="button" class="submit-btn" id="submitBtn" onclick="submitForm()">
+    <!-- הערות -->
+    <div class="section">
+      <div class="section-title" id="sec6Title">הערות</div>
+      <div class="field">
+        <label id="l_notes">הערות נוספות</label>
+        <textarea id="notes" rows="3" placeholder="הערות, בקשות מיוחדות..."></textarea>
+      </div>
+    </div>
+
+    <button id="submitBtn" onclick="submitForm()">
       <span id="submitText">שלח דיווח</span>
     </button>
   </form>
@@ -352,7 +361,7 @@
 
 <script>
 // ===================== הגדרות =====================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTaVshmvfx2AMqE2t6vPKZ9tuiYV1ImLBpM-3t3I_jiBtlfzzbBU6NJIrr8Mztpf73/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwN0OF_U7ok5ME-WHKRcJHSjN6iWOJKJRSJ6zwWY0uc35CVgN4VVCjoNDrbBNMF4s2P/exec';
 
 // ===================== תרגומים =====================
 const T = {
@@ -370,6 +379,7 @@ const T = {
     fileText:'לחץ לצילום או העלאת תמונה / PDF',
     l_wantEmail:'קבל העתק של הדיווח במייל (כולל קובץ מצורף אם יש)',
     l_email:'כתובת מייל',
+    sec6Title:'הערות', l_notes:'הערות נוספות',
     submitText:'שלח דיווח', sending:'שולח...',
     sTitle:'הדיווח נשלח בהצלחה!', sSub:'הנתונים נשמרו במערכת', newBtn:'דיווח חדש',
     required:'שדה חובה', invalidEmail:'כתובת מייל לא תקינה',
@@ -389,6 +399,7 @@ const T = {
     fileText:'Нажмите для съёмки или загрузки фото / PDF',
     l_wantEmail:'Получить копию отчёта на почту (включая файл, если есть)',
     l_email:'Эл. адрес',
+    sec6Title:'Примечания', l_notes:'Дополнительные примечания',
     submitText:'Отправить отчёт', sending:'Отправка...',
     sTitle:'Отчёт успешно отправлен!', sSub:'Данные сохранены в системе', newBtn:'Новый отчёт',
     required:'Обязательное поле', invalidEmail:'Неверный адрес эл. почты',
@@ -554,6 +565,7 @@ function collectData() {
     q_shutter: document.getElementById('q_shutter').value.trim() || '0',
     q_extra: document.getElementById('q_extra').value.trim() || '0',
     email: document.getElementById('wantEmail').checked ? document.getElementById('email').value.trim() : '',
+    notes: document.getElementById('notes').value.trim(),
     fileData: fileData || null,
     fileName: fileName || null,
     fileMime: fileMime || null,
@@ -582,14 +594,11 @@ async function submitForm() {
     } else {
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
-        mode: 'cors',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(data)
       });
-      const result = await res.json();
-      if (result && result.reportNum) {
-        reportNum = result.reportNum;
-      }
+      // no-cors - cannot read response
     }
 
     showSuccess(reportNum);
@@ -620,6 +629,7 @@ function resetForm() {
   document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
   document.querySelectorAll('.error-msg').forEach(e => e.style.display = 'none');
   document.getElementById('emailFieldWrapper').style.display = 'none';
+  document.getElementById('notes').value = '';
   buildOrders();
   document.getElementById('successScreen').style.display = 'none';
   document.getElementById('mainForm').style.display = 'block';
