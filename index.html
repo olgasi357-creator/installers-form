@@ -352,7 +352,7 @@
 
 <script>
 // ===================== הגדרות =====================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8b04xZ3NDuduzsiLZ5yzrIgm-h60UMQ5BhmbSCSFUoflsQWPEFPRr6bp6Yi9yG--A/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTaVshmvfx2AMqE2t6vPKZ9tuiYV1ImLBpM-3t3I_jiBtlfzzbBU6NJIrr8Mztpf73/exec';
 
 // ===================== תרגומים =====================
 const T = {
@@ -582,12 +582,14 @@ async function submitForm() {
     } else {
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(data)
       });
-      // no-cors — לא ניתן לקרוא תשובה, נניח הצלחה
-      reportNum = '✓';
+      const result = await res.json();
+      if (result && result.reportNum) {
+        reportNum = result.reportNum;
+      }
     }
 
     showSuccess(reportNum);
