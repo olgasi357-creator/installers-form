@@ -352,7 +352,7 @@
       </div>
     </div>
 
-    <button id="submitBtn" onclick="submitForm()">
+    <button type="button" class="submit-btn" id="submitBtn" onclick="submitForm()">
       <span id="submitText">שלח דיווח</span>
     </button>
   </form>
@@ -361,7 +361,7 @@
 
 <script>
 // ===================== הגדרות =====================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwN0OF_U7ok5ME-WHKRcJHSjN6iWOJKJRSJ6zwWY0uc35CVgN4VVCjoNDrbBNMF4s2P/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbws5WeS7HHk6bxNGA07sxWLk1pV9mkpRjXJ_gta5HZZQ0b34R7MVge10F6qf9V1WM7N/exec';
 
 // ===================== תרגומים =====================
 const T = {
@@ -584,6 +584,9 @@ async function submitForm() {
 
   const data = collectData();
 
+  // שמור timestamp לזיהוי
+  window._lastReportNum = new Date().getTime().toString().slice(-4);
+
   try {
     let reportNum = '—';
 
@@ -599,6 +602,8 @@ async function submitForm() {
         body: JSON.stringify(data)
       });
       // no-cors - cannot read response
+      // מספר דיווח מחושב לפי זמן שליחה (יוצג בהצלחה)
+      reportNum = window._lastReportNum || '✓';
     }
 
     showSuccess(reportNum);
