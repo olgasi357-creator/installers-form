@@ -311,7 +311,7 @@
         </div>
         <div class="field">
           <label id="l_q5">תוספת</label>
-          <input type="text" id="q_extra" placeholder="0" inputmode="numeric" />
+          <input type="text" id="q_extra" placeholder="לדוגמה: 10% או הערה" />
         </div>
       </div>
     </div>
@@ -636,13 +636,22 @@ function resetForm() {
   document.querySelectorAll('.checkbox-item').forEach(el => el.classList.remove('checked'));
   document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
   document.querySelectorAll('.error-msg').forEach(e => e.style.display = 'none');
-  document.getElementById('emailFieldWrapper').style.display = 'none';
   document.getElementById('notes').value = '';
   buildOrders();
   document.getElementById('successScreen').style.display = 'none';
   document.getElementById('mainForm').style.display = 'block';
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('submitText').textContent = T[lang].submitText;
+  document.getElementById('workDate').valueAsDate = new Date();
+  // שמירה על שם מתקין ומייל
+  const savedInstaller2 = localStorage.getItem('installer_name');
+  const savedEmail2 = localStorage.getItem('installer_email');
+  if (savedInstaller2) document.getElementById('installer').value = savedInstaller2;
+  if (savedEmail2) {
+    document.getElementById('email').value = savedEmail2;
+    document.getElementById('wantEmail').checked = true;
+    document.getElementById('emailFieldWrapper').style.display = 'block';
+  }
   window.scrollTo(0, 0);
 }
 
